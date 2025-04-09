@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Check and install dependencies
+install_if_missing() {
+  if ! dpkg -s "$1" &> /dev/null; then
+    echo "Installing missing package: $1"
+    sudo apt-get update
+    sudo apt-get install -y "$1"
+  fi
+}
+
 # Check if LAB_HOME is set
 if [ -z "${LAB_HOME}" ]; then
   echo "[ERROR] LAB_HOME is not set. Please export LAB_HOME before running this script."
@@ -22,25 +31,8 @@ if [ ! -f "${TEST_SCRIPT}" ]; then
   exit 1
 fi
 
-# Check if expect is installed
-if ! command -v expect &> /dev/null; then
-  echo "[INFO] 'expect' is not installed. Installing it now..."
-  sudo apt update && sudo apt install -y expect
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] Failed to install expect. Please install it manually."
-    exit 1
-  fi
-fi
-
-# Check if libncurses-dev is installed
-if ! command -v libncurses-dev &> /dev/null; then
-  echo "[INFO] 'libncurses-dev' is not installed. Installing it now..."
-  sudo apt update && sudo apt install -y libncurses-dev
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] Failed to install libncurses-dev. Please install it manually."
-    exit 1
-  fi
-fi
+install_if_missing "expect"
+install_if_missing "libncurses-dev"
 
 # Run test
 echo "[INFO] Running test script for ${TARGET}"

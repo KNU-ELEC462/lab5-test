@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Check and install dependencies
-install_if_missing() {
-  if ! dpkg -s "$1" &> /dev/null; then
-    echo "Installing missing package: $1"
-    sudo apt-get update
-    sudo apt-get install -y "$1"
-  fi
-}
-
-install_if_missing "expect"
-install_if_missing "libncurses-dev"
-
 TARGET="move"
 SRC="./${TARGET}.c"
 BIN="./${TARGET}"
