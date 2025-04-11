@@ -73,16 +73,21 @@ rm -f $AUTOSAVE_FILE $EXPECTED_FILE
 expect << EOF
 log_user 0
 spawn ./$EXEC
+set pid [exp_pid]  ;# Get the spawned process PID
 
 expect "Enter text"
 sleep 1
 send "SIGALRM Line 1\r"
 sleep 1
 send "SIGALRM Line 2\r"
-# Wait enough time for alarm(5) to trigger auto-save
+
+# Wait for autosave (5 seconds)
 sleep 6
-# Send SIGINT to exit
-send "\003"
+
+# Send SIGKILL using 'exec kill -9'
+exec kill -9 \$pid
+
+# Wait for process to be cleaned up
 expect eof
 EOF
 
