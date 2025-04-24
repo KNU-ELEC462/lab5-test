@@ -99,13 +99,13 @@ fi
 echo "=== Test 5: Custom Exec Program ==="
 
 # Compile the test_exec program
-gcc -o test_exec test_exec.c
+gcc -o ${LAB_HOME}/test/test_exec ${LAB_HOME}/test/test_exec.c
 if [[ $? -ne 0 ]]; then
   echo "FAIL: test_exec build failed."
   exit 1
 fi
 
-run_expect "test5_custom_exec" ./test_exec
+run_expect "test5_custom_exec" ./test/test_exec
 
 # Check execution message
 if grep -q "I was executed!" "${OUTPUT_DIR}/test5_custom_exec.log"; then
