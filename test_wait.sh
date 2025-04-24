@@ -3,7 +3,7 @@
 TARGET="wait"
 SRC="./${TARGET}.c"
 BIN="./${TARGET}"
-OUTPUT_DIR="outputs"
+OUTPUT_DIR="outputs_wait"
 
 # Check if source file exists
 if [[ ! -f "$SRC" ]]; then
@@ -19,6 +19,7 @@ if ! gcc -o "$BIN" "$SRC" 2> build_error.log; then
 fi
 rm -f build_error.log
 
+rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 ############################################

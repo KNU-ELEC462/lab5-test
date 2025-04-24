@@ -1,9 +1,9 @@
 #!/bin/bash
 
-TARGET="psh2"
+TARGET="psh3"
 SRC="./${TARGET}.c"
 BIN="./${TARGET}"
-OUTPUT_DIR="outputs_psh2"
+OUTPUT_DIR="outputs_psh3"
 
 # Check if source file exists
 if [[ ! -f "$SRC" ]]; then
@@ -214,6 +214,92 @@ else
   exit 1
 fi
 
+
+############################################
+# Test 7: Ctrl+C - Child gets SIGINT, Shell stays alive
+############################################
+echo "=== Test 7: Ctrl+C Handling (Child gets SIGINT, Shell alive) ==="
+
+# Ensure the 'sleep' command exists in the system
+if ! command -v sleep &> /dev/null; then
+  echo "FAIL: 'sleep' command not found on this system."
+  exit 1
+fi
+
+# Run psh3 and test Ctrl+C behavior
+expect <<EOF > /dev/null
+  set timeout 5
+  log_file -noappend "${OUTPUT_DIR}/test7_sigint.log"
+
+  spawn $BIN
+
+  # Input: sleep 100
+  expect -re "Arg\\[0\\]\\?"
+  send "sleep\r"
+
+  expect -re "Arg\\[1\\]\\?"
+  send "100\r"
+
+  expect -re "Arg\\[2\\]\\?"
+  send "\r"
+
+  # Wait a bit to ensure child process is running
+  after 1000
+
+  # Send Ctrl+C (SIGINT)
+  send "\003"
+
+  # Check child termination
+  expect {
+    -re "Child exited with status 0, signal 2" {}
+    timeout { puts "FAIL: Child did not terminate on Ctrl+C."; exit 1 }
+  }
+
+  # Check if shell is still alive (with catch)
+  if {[catch {
+    expect {
+      -re "Arg\\[0\\]\\?" {}
+      eof { puts "FAIL: Shell exited! SIGINT was not ignored by parent."; exit 1 }
+      timeout { puts "FAIL: Shell did not return to prompt after Ctrl+C."; exit 1 }
+    }
+  } err]} {
+    puts "FAIL: Shell process already terminated. SIGINT was not ignored."
+    exit 1
+  }
+
+EOF
+
+# Validate output log
+if grep -q "Child exited with status 0, signal 2" "${OUTPUT_DIR}/test7_sigint.log" && \
+  grep -q "Arg\[0\]\?" "${OUTPUT_DIR}/test7_sigint.log"; then
+  echo "PASS: Ctrl+C correctly terminated child, shell remained active."
+else
+  echo "FAIL: Ctrl+C handling failed."
+  exit 1
+fi
+
+
+############################################
+# Test 8: Built-in exit Command (Immediate Exit)
+############################################
+echo "=== Test 8: Built-in exit Command ==="
+
+expect <<EOF > /dev/null
+  set timeout 2
+  log_file -noappend "${OUTPUT_DIR}/test8_exit.log"
+  spawn $BIN
+  expect "Arg\[0\]?"
+  send "exit\r"
+  expect "Exiting shell."
+  expect eof
+EOF
+
+if grep -q "Exiting shell." "${OUTPUT_DIR}/test8_exit.log"; then
+  echo "PASS: Shell exited immediately after 'exit' command."
+else
+  echo "FAIL: Shell did not handle 'exit' command properly."
+  exit 1
+fi
 
 echo ""
 echo "SUCCESS: All tests PASS!"
