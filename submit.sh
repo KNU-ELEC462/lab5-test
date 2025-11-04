@@ -27,6 +27,15 @@ fi
 # Step 2: Check if user.name and user.email are configured
 name=$(git config --get user.name)
 email=$(git config --get user.email)
+
+# Fallback to global config if local config is empty
+if [ -z "$name" ]; then
+  name=$(git config --global --get user.name)
+fi
+if [ -z "$email" ]; then
+  email=$(git config --global --get user.email)
+fi
+
 echo -e "${GREEN}[INFO] Git user: $name <$email>${NC}"
 
 if [ -z "$name" ] || [ -z "$email" ]; then
