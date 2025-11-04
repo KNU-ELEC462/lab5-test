@@ -15,8 +15,8 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Default commit message
-LAB_ID=6
-DEFAULT_MSG="[SUBMIT] Lab #${LAB_ID}"
+REPO_NAME="$(basename "$(git config --get remote.origin.url)" .git)"
+DEFAULT_MSG="[SUBMIT] ${REPO_NAME}"
 
 # Step 1: Check if inside a git repo
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
