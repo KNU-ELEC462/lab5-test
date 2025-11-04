@@ -27,7 +27,7 @@ fi
 # Step 2: Check if user.name and user.email are configured
 name=$(git config --get user.name)
 email=$(git config --get user.email)
-echo -e "${GREEN}[INFO] Detected name='$name', email='$email'${NC}"
+echo -e "${GREEN}[INFO] Git user: $name <$email>${NC}"
 
 if [ -z "$name" ] || [ -z "$email" ]; then
   echo -e "${RED}[ERROR] Git user name and/or email not configured.${NC}"
@@ -37,8 +37,6 @@ if [ -z "$name" ] || [ -z "$email" ]; then
   echo "  git config --global user.email \"your@email.com\""
   exit 1
 fi
-
-echo -e "${GREEN}[INFO] Git user: $name <$email>${NC}"
 
 # Step 3: Pull latest changes to avoid conflicts
 echo -e "${GREEN}[INFO] Pulling latest changes from remote...${NC}"
