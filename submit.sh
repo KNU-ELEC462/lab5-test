@@ -25,8 +25,9 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 fi
 
 # Step 2: Check if user.name and user.email are configured
-name=$(git config user.name)
-email=$(git config user.email)
+name=$(git config --get user.name)
+email=$(git config --get user.email)
+echo -e "${GREEN}[INFO] Detected name='$name', email='$email'${NC}"
 
 if [ -z "$name" ] || [ -z "$email" ]; then
   echo -e "${RED}[ERROR] Git user name and/or email not configured.${NC}"
