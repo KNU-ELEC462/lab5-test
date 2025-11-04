@@ -31,9 +31,11 @@ email=$(git config --get user.email)
 # Fallback to global config if local config is empty
 if [ -z "$name" ]; then
   name=$(git config --global --get user.name)
+  git config user.name "${name}"
 fi
 if [ -z "$email" ]; then
   email=$(git config --global --get user.email)
+  git config user.email "${email}"
 fi
 
 echo -e "${GREEN}[INFO] Git user: $name <$email>${NC}"
